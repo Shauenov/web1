@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #000000;
+        }
+
+        .calculator {
+            background: #e6eef2;
+            border-radius: 8px;
+            padding: 10px;
+            width: 400px;
+        }
+
+        .display {
+            background: #ffffff;
+            border-radius: 4px;
+            padding: 10px;
+            font-size: 24px;
+            text-align: right;
+            margin-bottom: 10px;
+            height: 50px;
+            color: #000000;
+            overflow: hidden;
+            border: 1px solid #ccc;
+        }
+
+        .memory {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .title {
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 5px;
+        }
+
+        .button {
+            padding: 15px;
+            font-size: 18px;
+            text-align: center;
+            background: #d4dde2;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .button_operator{
+            width:60%;
+            height:60%;
+        }
+        .button_operator_large{
+            height: auto;
+            width: auto;
+            
+        }
+
+        .button:hover {
+            background: #c3cfd6;
+        }
+
+        .button:active {
+            background: #b0bcc2;
+        }
+
+        .button.ac {
+            background: #ff6666;
+            color: white;
+        }
+
+        .button.ac:hover {
+            background: #e65555;
+        }
+
+        .button.operator {
+            background: #b0bcc2;
+        }
+
+        .button.operator:hover {
+            background: #a1b0b7;
+        }
+
+        .button.equal {
+            background: #4d94ff;
+            color: white;
+            grid-row: span 2;
+            text-align: center;
+        }
+        .first, .second, .third, .fourth, .fifth, .sixth{
+            display: grid;
+            gap: 3px
+        }
+        .fifth, .sixth{
+            display: grid;
+            grid-template-columns: 20%,20%,20%,40%;
+        }
+        
+
+        .button.large {
+            grid-row: span 2;
+            height: auto;
+            width: auto;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="title">Бухгалтерский</div>
+        <div class="memory" id="memory">M1: 0</div>
+        <div class="display" id="display">0</div>
+        <div class="buttons">
+            <!-- First Column -->
+             <div class="first">
+                <div class="button" onclick="clearMemory()">MC</div>
+                <div class="button" onclick="toggleSign()">+/-</div>
+                <div class="button" onclick="backspace()">&#8592;</div>
+                <div class="button ac" onclick="clearDisplay()">AC</div>
+                <div class="button ac" onclick="clearDisplay()">C</div>
+             </div>
+            
+
+            <!-- Second Column -->
+             <div class="second">
+                <div class="button" onclick="recallMemory()">MR</div>
+                <div class="button" onclick="appendNumber('7')">7</div>
+                <div class="button" onclick="appendNumber('4')">4</div>
+                <div class="button" onclick="appendNumber('1')">1</div>
+                <div class="button" onclick="appendNumber('0')">0</div>
+             </div>
+            
+
+            <!-- Third Column -->
+            <div class="third">
+                <div class="button" onclick="subtractMemory()">M-</div>
+                <div class="button" onclick="appendNumber('8')">8</div>
+                <div class="button" onclick="appendNumber('5')">5</div>
+                <div class="button" onclick="appendNumber('2')">2</div>
+                <div class="button" onclick="appendNumber('00')">00</div>
+            </div>
+
+            <!-- Fourth Column -->
+            <div class="fourth">
+                <div class="button" onclick="addMemory()">M+</div>
+                <div class="button" onclick="appendNumber('9')">9</div>
+                <div class="button" onclick="appendNumber('6')">6</div>
+                <div class="button" onclick="appendNumber('3')">3</div>
+                <div class="button" onclick="appendDecimal()">.</div>
+            </div>
+
+
+            <!-- Fifth Column -->
+            <div class="fifth">
+                <div class="button operator" onclick="squareRoot()">&#8730;</div>
+                <div class="button operator" onclick="setOperation('/')">&divide;</div>
+                <div class="button operator" onclick="setOperation('*')">&times;</div>
+                <div class="button operator large" onclick="setOperation('+')">+</div>
+            </div>
+
+
+            <!-- Sixth Column -->
+             <div class="sixth">
+                <div class="button operator" onclick="appendMemoryUsage()">MU</div>
+                <div class="button operator" onclick="setOperation('%')">%</div>
+                <div class="button operator" onclick="setOperation('-')">&minus;</div>
+                <div class="button equal" onclick="calculate()">=</div>
+             </div>
+
+        </div>
+    </div>
+
+    <script>
+        let display = document.getElementById('display');
+        let memoryDisplay = document.getElementById('memory');
+        let currentOperation = null;
+        let firstOperand = '';
+        let secondOperand = '';
+        let memory = 0;
+
+        function appendNumber(number) {
+            if (currentOperation === null) {
+                firstOperand += number;
+                display.textContent = firstOperand;
+            } else {
+                secondOperand += number;
+                display.textContent = secondOperand;
+            }
+        }
+
+        function setOperation(operation) {
+            if (firstOperand === '') return;
+            currentOperation = operation;
+        }
+
+        function clearDisplay() {
+            firstOperand = '';
+            secondOperand = '';
+            currentOperation = null;
+            display.textContent = '0';
+        }
+
+        function calculate() {
+            if (currentOperation === null || secondOperand === '') return;
+
+            const num1 = parseFloat(firstOperand);
+            const num2 = parseFloat(secondOperand);
+            let result;
+
+            switch (currentOperation) {
+                case '+':
+                    result = num1 + num2;
+                    break;
+                case '-':
+                    result = num1 - num2;
+                    break;
+                case '*':
+                    result = num1 * num2;
+                    break;
+                case '/':
+                    result = num2 === 0 ? 'Error' : num1 / num2;
+                    break;
+                default:
+                    return;
+            }
+
+            display.textContent = result;
+            firstOperand = result.toString();
+            secondOperand = '';
+            currentOperation = null;
+        }
+
+        function squareRoot() {
+            if (firstOperand !== '') {
+                const result = Math.sqrt(parseFloat(firstOperand));
+                display.textContent = result;
+                firstOperand = result.toString();
+            }
+        }
+
+        function appendDecimal() {
+            if (currentOperation === null) {
+                if (!firstOperand.includes('.')) {
+                    firstOperand += '.';
+                    display.textContent = firstOperand;
+                }
+            } else {
+                if (!secondOperand.includes('.')) {
+                    secondOperand += '.';
+                    display.textContent = secondOperand;
+                }
+            }
+        }
+
+        function toggleSign() {
+            if (currentOperation === null && firstOperand !== '') {
+                firstOperand = (-parseFloat(firstOperand)).toString();
+                display.textContent = firstOperand;
+            } else if (secondOperand !== '') {
+                secondOperand = (-parseFloat(secondOperand)).toString();
+                display.textContent = secondOperand;
+            }
+        }
+
+        function backspace() {
+            if (currentOperation === null && firstOperand !== '') {
+                firstOperand = firstOperand.slice(0, -1) || '0';
+                display.textContent = firstOperand;
+            } else if (secondOperand !== '') {
+                secondOperand = secondOperand.slice(0, -1) || '0';
+                display.textContent = secondOperand;
+            }
+        }
+
+        function clearMemory() {
+            memory = 0;
+            memoryDisplay.textContent = 'M1: 0';
+        }
+
+        function recallMemory() {
+            display.textContent = memory;
+            if (currentOperation === null) {
+                firstOperand = memory.toString();
+            } else {
+                secondOperand = memory.toString();
+            }
+        }
+
+        function addMemory() {
+            memory += parseFloat(display.textContent);
+            memoryDisplay.textContent = `M1: ${memory}`;
+        }
+
+        function subtractMemory() {
+            memory -= parseFloat(display.textContent);
+            memoryDisplay.textContent = `M1: ${memory}`;
+        }
+
+        function appendMemoryUsage() {
+            alert('MU feature pressed (implement your logic here)');
+        }
+    </script>
+</body>
+</html>
